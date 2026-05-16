@@ -1,22 +1,58 @@
-[![official JetBrains project](https://jb.gg/badges/official-plastic.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
+# KMP Swift Native
 
-# Kotlin/Native Template
+A Kotlin Multiplatform project demonstrating how Kotlin/Native can consume a local Swift package via SwiftPM integration. Includes a real-world example of accessing the macOS Keychain from Kotlin through a Swift wrapper.
 
-A mostly-empty template to get started creating a Kotlin/Native project. 
+## What this is
 
-## Getting Started
+Kotlin/Native can call Swift code through an Objective-C bridge. This project wires up that bridge end-to-end: a Swift package exposes `@objc`-annotated classes, the Gradle build links them via `swiftPMDependencies`, and Kotlin imports them as regular types from the `swiftPMImport.kmp.swift.native.*` package.
 
-1. On the project page, click on the `Use this template` button
-2. Click on the `Create a new repository` drop-down item
-3. Fill in the details of the new repository you'll be creating under your account
-4. Click the `Create repository` button
-5. Browse to your repository and make the needed changes there.
+## Project layout
 
-## Code of conduct
+| Path | Description |
+|------|-------------|
+| `src/nativeMain/kotlin/Main.kt` | Entry point |
+| `src/nativeMain/kotlin/Library.kt` | JSON serialization with kotlinx-serialization |
+| `src/nativeMain/kotlin/UseLocalPackage.kt` | Calls Swift functions (greetings, arithmetic) |
+| `src/nativeMain/kotlin/Keychain.kt` | Lists macOS Keychain items via the Swift wrapper |
+| `LocalPackage/Sources/LocalPackage/` | Swift target: basic API (`hello`, `greet`, `calculateSum`) |
+| `LocalPackage/Sources/KeychainService/` | Swift target: full Keychain read/search wrapper |
+| `build.gradle.kts` | Kotlin/Native build config with SwiftPM dependency |
 
-Please read [our code of conduct](https://github.com/jetbrains#code-of-conduct).
+## How it works
 
-## License
+```
+Swift (@objc class)
+  → Objective-C bridge (compiler-generated header)
+    → Kotlin/Native C interop
+      → imported as swiftPMImport.kmp.swift.native.*
+```
 
-The [kmp-native-wizard template](https://github.com/Kotlin/kmp-native-wizard/) is licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.en).
+`build.gradle.kts` links the package with:
+
+```kotlin
+swiftPMDependencies {
+    localPackage(path = "../LocalPackage")
+}
+```
+
+Kotlin then calls Swift directly:
+
+```kotlin
+val pkg = HelloFromLocalPackage()
+println(pkg.greet(name = "World"))
+```
+
+## Build & run
+
+Requires macOS with Xcode and a JDK.
+
+```bash
+./gradlew runDebugExecutableNative
+```
+
+## Requirements
+
+- macOS (Keychain features) or Linux/Windows (core interop only)
+- Xcode / Swift toolchain
+- JDK 11+
+- Kotlin 2.x
