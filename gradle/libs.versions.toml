@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.1.0"
+kotlin = "2.4.0-titan-214"
 kotlinxSerialization = "1.8.0"
 
 [libraries]

@@ -3,12 +3,8 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
 }
 
-group = "me.user"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
 
 kotlin {
     val hostOs = System.getProperty("os.name")
@@ -28,7 +24,18 @@ kotlin {
             executable {
                 entryPoint = "main"
             }
+//            sharedLib {
+//                baseName = "native"
+//            }
+
         }
+    }
+
+    swiftPMDependencies {
+        localPackage(
+            path = projectDir.resolve("LocalPackage"),
+            products = listOf("LocalPackage")
+        )
     }
 
     sourceSets {

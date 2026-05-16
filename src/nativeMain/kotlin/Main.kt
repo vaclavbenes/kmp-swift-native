@@ -1,21 +1,9 @@
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import platform.Foundation.NSFileManager
 
-@Serializable
-private data class Message(
-    val topic: String,
-    val content: String,
-)
+fun main(){
+//    library()
+//    useLocalPackage()
+//    keychain()
 
-private val PrettyPrintJson = Json {
-    prettyPrint = true
-}
-
-fun main() {
-    val message = Message(
-        topic = "Kotlin/Native",
-        content = "Hello!"
-    )
-    println(PrettyPrintJson.encodeToString(message))
+    println(NSFileManager.defaultManager.currentDirectoryPath)
 }
